@@ -5,8 +5,11 @@ using UnityEngine;
 
 public class PathFinder : MonoBehaviour
 {
-    public Vector2Int startCoodinate;
-    public Vector2Int destinateCoordinate;
+    [SerializeField] Vector2Int startCoordinate;
+    public Vector2Int StartCoordinate { get { return startCoordinate; } }
+
+    [SerializeField] Vector2Int destinateCoordinate;
+    public Vector2Int DestinateCoordinate { get { return destinateCoordinate; } }
 
     Node startNode;
     Node destinationNode;
@@ -19,22 +22,33 @@ public class PathFinder : MonoBehaviour
     GridManager gridManager;
     Dictionary<Vector2Int, Node> grid = new Dictionary<Vector2Int, Node>();
 
-    private void Awake()
+    void Awake()
     {
         gridManager = FindObjectOfType<GridManager>();
         if(gridManager != null)
         {
             grid = gridManager.Grid;
+            startNode = gridManager.Grid[startCoordinate];
+            destinationNode = gridManager.Grid[destinateCoordinate];
         }
     }
 
     void Start()
-    { 
-        startNode = gridManager.Grid[startCoodinate];
-        destinationNode = gridManager.Grid[destinateCoordinate];
+    {
 
-        BreadthFirstSearch();
-        BuildPath() ;
+        GetNewPath();
+    }
+
+    public List<Node> GetNewPath()
+    {
+        return GetNewPath(startCoordinate);
+    }
+
+    public List<Node> GetNewPath(Vector2Int coordinate)
+    {
+        gridManager.ResetNode();
+        BreadthFirstSearch(coordinate);
+        return BuildPath();
     }
 
     void ExploreNeighbor()
@@ -44,10 +58,10 @@ public class PathFinder : MonoBehaviour
         foreach(Vector2Int direction in directions)
         {
             Vector2Int neighborCoordi = currentSearchNode.coordinate + direction;//xac dinh vi tri toa do cua cac Node lan can
-
-            if (grid.ContainsKey(neighborCoordi))//kra coi cac o lan can co Grid chua, neu chua thi them vao dsach neighBor
+             
+            if (gridManager.Grid.ContainsKey(neighborCoordi))//kra coi cac o lan can co Grid chua, neu chua thi them vao dsach neighBor
             {
-                neighbors.Add(grid[neighborCoordi]);
+                neighbors.Add(gridManager.GetNode(neighborCoordi));
             }
         }
 
@@ -62,12 +76,18 @@ public class PathFinder : MonoBehaviour
         }
     }
 
-    void BreadthFirstSearch()
+    void BreadthFirstSearch(Vector2Int coordinate)
     {
+        startNode.isWalkable = true;
+        destinationNode.isWalkable = true;
+
+        frontier.Clear();
+        reached.Clear();
+
         bool isRunning = true;
 
-        frontier.Enqueue(startNode);//them startNode vao Frontier
-        reached.Add(startCoodinate, startNode);//startNode sau khi dc duyet thi cho vao reached
+        frontier.Enqueue(grid[coordinate]);//them startNode vao Frontier
+        reached.Add(coordinate, grid[coordinate]);//startNode sau khi dc duyet thi cho vao reached
 
         while(frontier.Count > 0 && isRunning)//da co Bien Gioi xac dinh duoc va Chay
         {
@@ -80,6 +100,7 @@ public class PathFinder : MonoBehaviour
             }
         }
     }
+
     List<Node> BuildPath()
     {
         List<Node> path = new List<Node>();
@@ -97,6 +118,29 @@ public class PathFinder : MonoBehaviour
 
         path.Reverse();// dao nguoc lai dsach path tu Dich ve Goc
         return path;
+    }
+
+    public bool BlockPath(Vector2Int coordinate)
+    {
+        if (grid.ContainsKey(coordinate))
+        {
+            bool previousState = grid[coordinate].isWalkable;
+            grid[coordinate].isWalkable = false;
+            List<Node> newPath = GetNewPath();
+            grid[coordinate].isWalkable = previousState;
+
+            if(newPath.Count <= 0.5)
+            {
+                GetNewPath();
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void NotifyReceive()
+    {
+        BroadcastMessage("RecalculatePath",false, SendMessageOptions.DontRequireReceiver);
     }
 
 }

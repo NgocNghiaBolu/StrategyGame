@@ -4,7 +4,13 @@ using UnityEngine;
 
 public class Tower : MonoBehaviour
 {
-    public int cost = 30; 
+    public int cost = 65;
+    public float shootDelay = 1.1f;
+
+    private void Start()
+    {
+        StartCoroutine(Shoot());
+    }
 
     public bool CreateTower(Tower tower, Vector3 position)
     {
@@ -21,5 +27,27 @@ public class Tower : MonoBehaviour
             return true;
         }
         return false;
+    }
+
+    IEnumerator Shoot()
+    {
+        foreach(Transform child in transform)
+        {
+            child.gameObject.SetActive(false);
+            foreach(Transform grandChild in child)
+            {
+                grandChild.gameObject.SetActive(false);
+            }
+        }
+
+        foreach (Transform child in transform)
+        {
+            child.gameObject.SetActive(true);
+            yield return new WaitForSeconds(shootDelay);
+            foreach (Transform grandChild in child)
+            {
+                grandChild.gameObject.SetActive(true);
+            }
+        }
     }
 }

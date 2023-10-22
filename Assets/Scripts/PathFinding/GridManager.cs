@@ -22,7 +22,7 @@ public class GridManager : MonoBehaviour
     {
         if (grid.ContainsKey(coordinate))//neu grid chua phan tu voi key(coodinate)
         {
-            return grid[coordinate];//tra ve coordinate tuong ung
+            return grid[coordinate];//tra ve coordinates tuong ung
         }
         return null;// khong co node nao tim thay tai coodinate
     }
@@ -35,13 +35,23 @@ public class GridManager : MonoBehaviour
         }
     }
 
+    public void ResetNode()
+    {
+        foreach(KeyValuePair<Vector2Int, Node> entry in grid)
+        {
+            entry.Value.connectedTo = null;
+            entry.Value.isExplored = false;
+            entry.Value.isPath = false;
+        }
+    }
+
     public Vector2Int GetCoordinateFromPosition(Vector3 pos)
     {
-        Vector2Int coordinate = new Vector2Int();
-        coordinate.x = Mathf.RoundToInt(pos.x / unityGridSize);
-        coordinate.y = Mathf.RoundToInt(pos.z / unityGridSize);
+        Vector2Int coordinates = new Vector2Int();
+        coordinates.x = Mathf.RoundToInt(pos.x) / unityGridSize;
+        coordinates.y = Mathf.RoundToInt(pos.z) / unityGridSize;
 
-        return coordinate;
+        return coordinates;
     }
 
     public Vector3 GetPositionFromCoordinate(Vector2Int coordinate)
@@ -53,9 +63,9 @@ public class GridManager : MonoBehaviour
         return pos;
     }
 
-    private void CreateGrid()
+    public void CreateGrid()
     {
-        for(int x = 0; x< gridSize.x; x++)
+        for(int x = 0; x < gridSize.x; x++)
         {
             for(int y = 0; y < gridSize.y; y++)
             {

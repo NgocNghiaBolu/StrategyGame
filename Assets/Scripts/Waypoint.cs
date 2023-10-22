@@ -10,11 +10,13 @@ public class Waypoint : MonoBehaviour
     public bool IsPlaceable { get { return isPlaceable; } }
 
     GridManager gridManager;
+    PathFinder pathFinder;
     Vector2Int coordinate = new Vector2Int();
 
     void Awake()
     {
         gridManager = FindObjectOfType<GridManager>();
+        pathFinder = FindObjectOfType<PathFinder>();
     }
 
     void Start()
@@ -29,13 +31,18 @@ public class Waypoint : MonoBehaviour
         }
     }
 
-    private void OnMouseDown()
+    void OnMouseDown()
     {
-        if (isPlaceable)
+        if (gridManager.GetNode(coordinate).isWalkable && !pathFinder.BlockPath(coordinate))
         {
             bool isPlaced = towerPrefab.CreateTower(towerPrefab, transform.position);
             //Debug.Log(transform.name);
-            isPlaceable = !isPlaced;// neu da click vao thi k dc click nua
+            if (isPlaced)
+            {
+                gridManager.BlockNode(coordinate);
+                pathFinder.NotifyReceive();
+            }
+
         }
     }
 }

@@ -26,7 +26,8 @@ public class ObjectPool : MonoBehaviour
         pool = new GameObject[poolSize];//gan pool bang poolsize
         for(int i = 0;i < pool.Length; i++)
         {
-            pool[i] = Instantiate(EnemyPrefabs, transform);
+            pool[i] = Instantiate(EnemyPrefabs, transform.position,Quaternion.identity);
+            pool[i].transform.parent = transform;
             pool[i].SetActive(false);
         }
     }

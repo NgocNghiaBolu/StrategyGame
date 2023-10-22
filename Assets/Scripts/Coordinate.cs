@@ -20,7 +20,7 @@ public class Coordinate : MonoBehaviour
     private void Awake()
     {
         label = GetComponent<TextMeshPro>();
-        label.enabled = true;
+        label.enabled = false;
         gridManager = FindObjectOfType<GridManager>();
         DisplayCoorDinate();
     }
@@ -33,8 +33,8 @@ public class Coordinate : MonoBehaviour
             UpdateNameObject();
             label.enabled = true;
         }
-        SetLabelColor();
         ToggleLabel();
+        SetLabelColor();    
     }
 
     void SetLabelColor()
@@ -73,7 +73,7 @@ public class Coordinate : MonoBehaviour
 
     private void DisplayCoorDinate()
     {
-        if(gridManager == null) { return; }
+        if(gridManager == null)  return; 
         coordinate.x = Mathf.RoundToInt(transform.parent.position.x / gridManager.UnityGridSize);
         coordinate.y = Mathf.RoundToInt(transform.parent.position.z / gridManager.UnityGridSize);
 

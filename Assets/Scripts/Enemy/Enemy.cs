@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class Enemy : MonoBehaviour
 {
-    public int coinReward = 25;
-    public int coinPenalty = 25;
+    public int coinReward = 50;
+    public int coinPenalty = 50;
 
     Coin coin;
 
